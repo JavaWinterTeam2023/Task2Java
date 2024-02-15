@@ -6,3 +6,6 @@
 
 ## Simulation: 
 After running the simulation, log file can be taken in .\log or [this  folder](./log).
+
+## Video:
+https://youtu.be/XzNxbJsPMHQ?si=OV_-RhID69i76eEW 
