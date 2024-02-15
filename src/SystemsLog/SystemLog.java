@@ -1,3 +1,4 @@
+package SystemsLog;
 import static java.nio.file.StandardCopyOption.*;
 import java.nio.file.*;
 import java.time.LocalDateTime;
@@ -12,8 +13,8 @@ public class SystemLog extends LogFileOperations{
 		ERROR
 	}
 	
-	public SystemLog(Path filePath) {
-		super(filePath);
+	public SystemLog(Path filePath, Path dirPath) {
+		super(filePath, dirPath);
 	}
 	
 	private void updateLog(String message, LogType type) {

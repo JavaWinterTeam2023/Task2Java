@@ -1,104 +1,42 @@
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.nio.file.*;
+import java.time.LocalDateTime;
 
-class ChargingStation {
-    private List<Car> chargingSpots;
-    private List<String> energySources;
-    private int chargingTime; // in milliseconds
-    private int maxWaitTime; // in milliseconds
-    private String logFile;
+import SystemsLog.*;
 
-    public ChargingStation(List<String> energySources, int numberOfSpots, int chargingTime, int maxWaitTime, String logFile) {
-        this.energySources = energySources;
-        this.chargingSpots = new ArrayList<>(numberOfSpots);
-        this.chargingTime = chargingTime;
-        this.maxWaitTime = maxWaitTime;
-        this.logFile = logFile;
-
-        for (int i = 0; i < numberOfSpots; i++) {
-            chargingSpots.add(null); // Initialize spots as empty
-        }
-    }
-
-    public boolean chargeCar(Car car) {
-        long startTime = System.currentTimeMillis();
-
-        while (true) {
-            for (int i = 0; i < chargingSpots.size(); i++) {
-                if (chargingSpots.get(i) == null) {
-                    chargingSpots.set(i, car);
-                    logCharging(car, i);
-                    simulateChargingTime();
-                    return true;
-                }
-            }
-
-            if (System.currentTimeMillis() - startTime > maxWaitTime) {
-                logWaitedTooLong(car);
-                return false;
-            }
-
-            simulateWeatherConditions();
-        }
-    }
-
-    private void logCharging(Car car, int spot) {
-        String logMessage = "Car " + car.getName() + " is charging at station with energy source " + energySources.get(spot);
-        writeLog(logMessage);
-    }
-
-    private void logWaitedTooLong(Car car) {
-        String logMessage = "Car " + car.getName() + " waited too long. Moving to another station.";
-        writeLog(logMessage);
-    }
-
-    private void writeLog(String logMessage) {
-        try (Writer writer = new BufferedWriter(new FileWriter(logFile, true))) {
-            writer.write(logMessage + "\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void simulateChargingTime() {
-        try {
-            Thread.sleep(chargingTime);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void simulateWeatherConditions() {
-        Random random = new Random();
-        int randomIndex = random.nextInt(energySources.size());
-        String logMessage = "Weather conditions change at station. Switching to energy source " + energySources.get(randomIndex);
-        writeLog(logMessage);
-    }
-}
-
-class CarChargingSimulation {
-    public static void main(String[] args) {
-        List<String> energySources = List.of("Solar", "Wind", "Hydro");
-        ChargingStation chargingStation = new ChargingStation(energySources, 5, 2000, 5000, "charging_log.txt");
-
-        for (int i = 0; i < 10; i++) {
-            Car car = new Car("Car" + i);
-            chargingStation.chargeCar(car);
-        }
-    }
-}
-
-class Car {
-    private String name;
-
-    public Car(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+public class Simulation {
+	public static void main(String[] args) {
+		Path dirPath = Path.of("./log");
+		Path logCharging = Paths.get("ChargingEvents.log") ;
+		Path logEnergy = Paths.get("Energy.log");
+		Path logSystem = Paths.get("System.log");
+		
+        ChargingStationLog eventLogger = new ChargingStationLog(logCharging, dirPath);
+        EnergyManagementLog energyLogger = new EnergyManagementLog(logEnergy, dirPath);
+        SystemLog systemLogger = new SystemLog(logSystem, dirPath);
+        
+        eventLogger.createLogFile(logCharging);
+        energyLogger.createLogFile(logEnergy);
+        systemLogger.createLogFile(logSystem);
+        
+        // Simulated charging event data
+        String locationId = "Station 1";
+        LocalDateTime startTime = LocalDateTime.of(2023, 11, 19, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2023, 11, 19, 12, 0);
+        String energySource = "Solar";
+        double energyTransferred = 30.5; // kWh
+        double chargingPower = 7.2; // kW
+        
+        String systemInfoMessage = "System start successfully";
+        String systemWarningMessage = "Weak connection to station 1";
+        String systemErrorMessage = "Failed to connect to database";
+        systemLogger.infoLog(systemInfoMessage);
+        systemLogger.warningLog(systemWarningMessage);
+        systemLogger.errorLog(systemErrorMessage);
+        
+        eventLogger.logChargingEvent(locationId, startTime, endTime, chargingPower);
+        energyLogger.EnergyConsumptionLog(locationId, startTime, endTime, energySource, 
+        		energyTransferred, chargingPower);
+        eventLogger.archieveLogFile();
+	}
 }

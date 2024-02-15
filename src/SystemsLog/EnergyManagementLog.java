@@ -1,4 +1,4 @@
-package LogFile;
+package SystemsLog;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -6,8 +6,8 @@ import java.time.format.DateTimeFormatter;
 
 public class EnergyManagementLog extends LogFileOperations{
 
-	public EnergyManagementLog(Path filePath) {
-		super(filePath);
+	public EnergyManagementLog(Path filePath, Path dirPath) {
+		super(filePath, dirPath);
 	}
 	
 	public void EnergyConsumptionLog (String locationId, LocalDateTime startTime, 
